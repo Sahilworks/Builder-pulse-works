@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,12 +26,16 @@ interface ReviewProps {
 }
 
 export const Review = ({ data }: ReviewProps) => {
+  const navigate = useNavigate();
+
   const handleSubmit = () => {
     // Here you would typically submit the form data to your backend
     console.log("Submitting registration data:", data);
-    alert(
-      "Registration submitted successfully! You will receive a confirmation email shortly.",
-    );
+
+    // Simulate form submission
+    setTimeout(() => {
+      navigate("/registration-success");
+    }, 1000);
   };
 
   const getCompletionStatus = () => {
