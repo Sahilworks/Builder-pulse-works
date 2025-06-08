@@ -6,33 +6,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Upload, X, Plus } from "lucide-react";
-import { FormData } from "../RegistrationForm";
+import { Upload, X, Plus, CheckCircle, Shield } from "lucide-react";
 
 interface PersonalInfoProps {
-  data: FormData;
-  updateData: (section: keyof FormData, data: any) => void;
+  data: any;
+  updateData: (section: string, data: any) => void;
 }
 
 const commonLanguages = [
   "English",
   "Hindi",
-  "Spanish",
+  "Marathi",
+  "Tamil",
+  "Telugu",
+  "Bengali",
+  "Gujarati",
+  "Kannada",
+  "Malayalam",
+  "Punjabi",
+  "Urdu",
   "French",
   "German",
-  "Mandarin",
-  "Arabic",
-  "Portuguese",
-  "Russian",
-  "Japanese",
-  "Korean",
-  "Italian",
-  "Dutch",
 ];
 
 export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
   const [newLanguage, setNewLanguage] = useState("");
   const [newAward, setNewAward] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleInputChange = (field: string, value: any) => {
     updateData("personalInfo", { [field]: value });
@@ -51,7 +53,7 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
   const removeLanguage = (language: string) => {
     handleInputChange(
       "languages",
-      data.personalInfo.languages.filter((lang) => lang !== language),
+      data.personalInfo.languages.filter((lang: string) => lang !== language),
     );
   };
 
@@ -68,35 +70,88 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
   const removeAward = (index: number) => {
     handleInputChange(
       "awards",
-      data.personalInfo.awards.filter((_, i) => i !== index),
+      data.personalInfo.awards.filter((_: any, i: number) => i !== index),
     );
   };
 
   const handleFileChange = (field: string, file: File | null) => {
     handleInputChange(field, file);
+
+    // AUTO-FETCH BIO FROM RESUME
+    if (field === "resume" && file) {
+      const simulatedBio = `Experienced medical professional with expertise in ${data.specialization?.selectedSpecialty || "healthcare"}. Dedicated to providing quality patient care with a focus on evidence-based medicine and compassionate treatment. Committed to continuous learning and staying updated with the latest medical advancements.`;
+      handleInputChange("bio", simulatedBio);
+    }
+  };
+
+  const sendOTP = async () => {
+    if (!data.personalInfo.mobileNumber) return;
+
+    setIsVerifying(true);
+    setTimeout(() => {
+      setOtpSent(true);
+      setIsVerifying(false);
+    }, 2000);
+  };
+
+  const verifyOTP = async () => {
+    if (!otp) return;
+
+    setIsVerifying(true);
+    setTimeout(() => {
+      if (otp === "123456") {
+        handleInputChange("mobileVerified", true);
+        // Auto-fill phone number in contact info
+        updateData("contactInfo", {
+          phoneNumber: data.personalInfo.mobileNumber,
+        });
+        setIsVerifying(false);
+      } else {
+        alert("Invalid OTP. Use 123456 for demo.");
+        setIsVerifying(false);
+      }
+    }, 1500);
   };
 
   return (
     <div className="space-y-6">
-      {/* Basic Information */}
+      {/* CHANGED: First Name & Last Name instead of Full Name */}
       <Card className="border-l-4 border-l-primary-green">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-primary-text mb-4">
             Basic Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* NEW: First Name Field */}
             <div className="space-y-2">
               <Label
-                htmlFor="fullName"
+                htmlFor="firstName"
                 className="text-primary-text font-medium"
               >
-                Full Name *
+                First Name *
               </Label>
               <Input
-                id="fullName"
-                value={data.personalInfo.fullName}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                placeholder="Enter your full name"
+                id="firstName"
+                value={data.personalInfo.firstName || ""}
+                onChange={(e) => handleInputChange("firstName", e.target.value)}
+                placeholder="Enter your first name"
+                className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
+              />
+            </div>
+
+            {/* NEW: Last Name Field */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="lastName"
+                className="text-primary-text font-medium"
+              >
+                Last Name *
+              </Label>
+              <Input
+                id="lastName"
+                value={data.personalInfo.lastName || ""}
+                onChange={(e) => handleInputChange("lastName", e.target.value)}
+                placeholder="Enter your last name"
                 className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
               />
             </div>
@@ -111,7 +166,7 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
               <Input
                 id="dateOfBirth"
                 type="date"
-                value={data.personalInfo.dateOfBirth}
+                value={data.personalInfo.dateOfBirth || ""}
                 onChange={(e) =>
                   handleInputChange("dateOfBirth", e.target.value)
                 }
@@ -119,6 +174,7 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
               />
             </div>
 
+            {/* CHANGED: Mobile Number with OTP Verification */}
             <div className="space-y-2">
               <Label
                 htmlFor="mobileNumber"
@@ -126,21 +182,58 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
               >
                 Mobile Number *
               </Label>
-              <Input
-                id="mobileNumber"
-                value={data.personalInfo.mobileNumber}
-                onChange={(e) =>
-                  handleInputChange("mobileNumber", e.target.value)
-                }
-                placeholder="+1 (555) 123-4567"
-                className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="mobileNumber"
+                  value={data.personalInfo.mobileNumber || ""}
+                  onChange={(e) =>
+                    handleInputChange("mobileNumber", e.target.value)
+                  }
+                  placeholder="+91 9876543210"
+                  className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
+                  disabled={data.personalInfo.mobileVerified}
+                />
+                {!data.personalInfo.mobileVerified ? (
+                  <Button
+                    onClick={sendOTP}
+                    disabled={!data.personalInfo.mobileNumber || isVerifying}
+                    className="bg-primary-green hover:bg-secondary-green"
+                  >
+                    {isVerifying ? "Sending..." : "Verify"}
+                  </Button>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-md">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-green-700 text-sm font-medium">
+                      Verified
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {otpSent && !data.personalInfo.mobileVerified && (
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter OTP (use 123456 for demo)"
+                    className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
+                  />
+                  <Button
+                    onClick={verifyOTP}
+                    disabled={!otp || isVerifying}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {isVerifying ? "Verifying..." : "Submit OTP"}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Languages Spoken */}
+      {/* Languages Section */}
       <Card className="border-l-4 border-l-secondary-green">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-primary-text mb-4">
@@ -217,7 +310,7 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
                 Selected Languages:
               </Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {data.personalInfo.languages.map((language) => (
+                {data.personalInfo.languages.map((language: string) => (
                   <Badge
                     key={language}
                     variant="secondary"
@@ -236,7 +329,7 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
         </CardContent>
       </Card>
 
-      {/* File Uploads */}
+      {/* File Uploads with Auto Bio Fetch */}
       <Card className="border-l-4 border-l-accent-blue">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-primary-text mb-4">
@@ -245,14 +338,14 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label className="text-primary-text font-medium">
-                Resume/CV *
+                Resume/CV * (Auto-fills Bio)
               </Label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-green transition-colors">
                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <div className="text-sm text-gray-600 mb-2">
                   {data.personalInfo.resume
                     ? data.personalInfo.resume.name
-                    : "Click to upload resume"}
+                    : "Upload resume to auto-fill bio"}
                 </div>
                 <input
                   type="file"
@@ -269,6 +362,12 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
                 >
                   Browse Files
                 </Label>
+                {data.personalInfo.resume && (
+                  <div className="text-xs text-green-600 mt-2 flex items-center justify-center gap-1">
+                    <Shield className="w-3 h-3" />
+                    Bio auto-filled from resume
+                  </div>
+                )}
               </div>
             </div>
 
@@ -317,10 +416,15 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
             <div className="space-y-2">
               <Label htmlFor="bio" className="text-primary-text font-medium">
                 Bio/Description *
+                {data.personalInfo.resume && (
+                  <span className="text-xs text-green-600 ml-2">
+                    (Auto-filled from resume)
+                  </span>
+                )}
               </Label>
               <Textarea
                 id="bio"
-                value={data.personalInfo.bio}
+                value={data.personalInfo.bio || ""}
                 onChange={(e) => handleInputChange("bio", e.target.value)}
                 placeholder="Tell patients about yourself, your experience, and your approach to medicine..."
                 rows={5}
@@ -350,22 +454,24 @@ export const PersonalInfo = ({ data, updateData }: PersonalInfoProps) => {
 
               {data.personalInfo.awards.length > 0 && (
                 <div className="space-y-2 mt-3">
-                  {data.personalInfo.awards.map((award, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
-                    >
-                      <span className="text-sm text-gray-700">{award}</span>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeAward(index)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  {data.personalInfo.awards.map(
+                    (award: string, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
                       >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                        <span className="text-sm text-gray-700">{award}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => removeAward(index)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ),
+                  )}
                 </div>
               )}
             </div>
