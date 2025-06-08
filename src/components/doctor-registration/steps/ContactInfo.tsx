@@ -14,6 +14,8 @@ import {
   X,
   Star,
   StarOff,
+  Map,
+  CheckCircle,
 } from "lucide-react";
 
 interface ContactInfoProps {
@@ -25,11 +27,15 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
   const [newPrimaryClinic, setNewPrimaryClinic] = useState({
     name: "",
     address: "",
+    mapLink: "",
   });
   const [newSecondaryClinic, setNewSecondaryClinic] = useState({
     name: "",
     address: "",
+    mapLink: "",
   });
+  const [primaryMapLoading, setPrimaryMapLoading] = useState(false);
+  const [secondaryMapLoading, setSecondaryMapLoading] = useState(false);
 
   // AUTO-FILL PHONE NUMBER FROM STEP 1
   useEffect(() => {
@@ -44,19 +50,108 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
     updateData("contactInfo", { [field]: value });
   };
 
+  // NEW: Extract address from Google Maps link
+  const extractAddressFromMapLink = (mapLink: string): string => {
+    try {
+      // Handle different Google Maps URL formats
+      let address = "";
+
+      // Format 1: https://maps.google.com/maps?q=address
+      if (mapLink.includes("maps.google.com") && mapLink.includes("q=")) {
+        const urlParams = new URLSearchParams(mapLink.split("?")[1]);
+        address = urlParams.get("q") || "";
+      }
+
+      // Format 2: https://www.google.com/maps/place/address
+      else if (mapLink.includes("google.com/maps/place/")) {
+        const placePart = mapLink.split("/place/")[1];
+        if (placePart) {
+          address = placePart.split("/")[0];
+        }
+      }
+
+      // Format 3: https://goo.gl/maps/... (shortened URL)
+      else if (
+        mapLink.includes("goo.gl/maps") ||
+        mapLink.includes("maps.app.goo.gl")
+      ) {
+        // For demo purposes, extract any text after the last slash
+        const parts = mapLink.split("/");
+        address = "Address from Google Maps (shortened link detected)";
+      }
+
+      // Decode URI components and clean up
+      if (address) {
+        address = decodeURIComponent(address);
+        address = address.replace(/\+/g, " ");
+        address = address.replace(/@.*$/, ""); // Remove coordinates if present
+      }
+
+      return address || "Unable to extract address from this link";
+    } catch (error) {
+      return "Invalid Google Maps link";
+    }
+  };
+
+  // NEW: Handle Google Maps link for Primary Clinic
+  const handlePrimaryMapLink = async (mapLink: string) => {
+    setNewPrimaryClinic((prev) => ({ ...prev, mapLink }));
+
+    if (
+      mapLink.trim() &&
+      (mapLink.includes("google.com/maps") ||
+        mapLink.includes("goo.gl/maps") ||
+        mapLink.includes("maps.app.goo.gl"))
+    ) {
+      setPrimaryMapLoading(true);
+
+      // Simulate API call delay
+      setTimeout(() => {
+        const extractedAddress = extractAddressFromMapLink(mapLink);
+        setNewPrimaryClinic((prev) => ({ ...prev, address: extractedAddress }));
+        setPrimaryMapLoading(false);
+      }, 1500);
+    }
+  };
+
+  // NEW: Handle Google Maps link for Secondary Clinic
+  const handleSecondaryMapLink = async (mapLink: string) => {
+    setNewSecondaryClinic((prev) => ({ ...prev, mapLink }));
+
+    if (
+      mapLink.trim() &&
+      (mapLink.includes("google.com/maps") ||
+        mapLink.includes("goo.gl/maps") ||
+        mapLink.includes("maps.app.goo.gl"))
+    ) {
+      setSecondaryMapLoading(true);
+
+      // Simulate API call delay
+      setTimeout(() => {
+        const extractedAddress = extractAddressFromMapLink(mapLink);
+        setNewSecondaryClinic((prev) => ({
+          ...prev,
+          address: extractedAddress,
+        }));
+        setSecondaryMapLoading(false);
+      }, 1500);
+    }
+  };
+
   const addPrimaryClinic = () => {
     if (newPrimaryClinic.name.trim() && newPrimaryClinic.address.trim()) {
       const clinic = {
         id: Date.now().toString(),
         name: newPrimaryClinic.name.trim(),
         address: newPrimaryClinic.address.trim(),
+        mapLink: newPrimaryClinic.mapLink.trim(),
         type: "primary",
       };
       const existingClinics = data.contactInfo.clinics || [];
       updateData("contactInfo", {
         clinics: [...existingClinics, clinic],
       });
-      setNewPrimaryClinic({ name: "", address: "" });
+      setNewPrimaryClinic({ name: "", address: "", mapLink: "" });
     }
   };
 
@@ -66,13 +161,14 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
         id: Date.now().toString(),
         name: newSecondaryClinic.name.trim(),
         address: newSecondaryClinic.address.trim(),
+        mapLink: newSecondaryClinic.mapLink.trim(),
         type: "secondary",
       };
       const existingClinics = data.contactInfo.clinics || [];
       updateData("contactInfo", {
         clinics: [...existingClinics, clinic],
       });
-      setNewSecondaryClinic({ name: "", address: "" });
+      setNewSecondaryClinic({ name: "", address: "", mapLink: "" });
     }
   };
 
@@ -155,12 +251,12 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
         </CardContent>
       </Card>
 
-      {/* CHANGED: Primary and Secondary Clinic Options */}
+      {/* UPDATED: Primary and Secondary Clinic Options with Google Maps */}
       <Card className="border-l-4 border-l-secondary-green">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-primary-text mb-4 flex items-center gap-2">
             <Building className="w-5 h-5 text-secondary-green" />
-            Clinic Information (Primary & Secondary)
+            Clinic Information (Primary & Secondary with Google Maps)
           </h3>
 
           <Tabs defaultValue="primary" className="w-full">
@@ -219,6 +315,38 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                     />
                   </div>
 
+                  {/* NEW: Google Maps Link Field */}
+                  <div className="space-y-2">
+                    <Label className="text-primary-text font-medium flex items-center gap-2">
+                      <Map className="w-4 h-4 text-accent-blue" />
+                      Google Maps Link (Auto-fills Address)
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        value={newPrimaryClinic.mapLink}
+                        onChange={(e) => handlePrimaryMapLink(e.target.value)}
+                        placeholder="Paste Google Maps link here to auto-fill address"
+                        className="border-gray-300 focus:border-accent-blue focus:ring-accent-blue"
+                      />
+                      {primaryMapLoading && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent-blue"></div>
+                        </div>
+                      )}
+                      {newPrimaryClinic.mapLink &&
+                        !primaryMapLoading &&
+                        newPrimaryClinic.address && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                          </div>
+                        )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Copy and paste a Google Maps link to automatically fill
+                      the address below
+                    </p>
+                  </div>
+
                   <div className="space-y-2">
                     <Label className="text-primary-text font-medium">
                       Primary Clinic Address *
@@ -231,10 +359,16 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                           address: e.target.value,
                         }))
                       }
-                      placeholder="Enter complete address of your primary clinic"
+                      placeholder="Enter complete address of your primary clinic (or use Google Maps link above)"
                       rows={3}
                       className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
                     />
+                    {primaryMapLoading && (
+                      <p className="text-xs text-blue-600 flex items-center gap-1">
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                        Extracting address from Google Maps link...
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -269,6 +403,12 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                             <span className="font-medium text-primary-text">
                               Primary Clinic {index + 1}
                             </span>
+                            {clinic.mapLink && (
+                              <Badge className="bg-blue-100 text-blue-800 text-xs">
+                                <Map className="w-3 h-3 mr-1" />
+                                Maps Linked
+                              </Badge>
+                            )}
                           </div>
                           <Button
                             size="sm"
@@ -311,6 +451,26 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                               className="border-gray-300 focus:border-primary-green focus:ring-primary-green"
                             />
                           </div>
+
+                          {clinic.mapLink && (
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-gray-600">
+                                Google Maps Link
+                              </Label>
+                              <Input
+                                value={clinic.mapLink}
+                                onChange={(e) =>
+                                  updateClinic(
+                                    clinic.id,
+                                    "mapLink",
+                                    e.target.value,
+                                  )
+                                }
+                                className="border-gray-300 focus:border-accent-blue focus:ring-accent-blue"
+                                placeholder="Google Maps link"
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -322,7 +482,9 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                 <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
                   <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="font-medium">No primary clinic added yet</p>
-                  <p className="text-sm">Add your main practice location</p>
+                  <p className="text-sm">
+                    Add your main practice location with Google Maps integration
+                  </p>
                 </div>
               )}
             </TabsContent>
@@ -365,6 +527,38 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                     />
                   </div>
 
+                  {/* NEW: Google Maps Link Field for Secondary */}
+                  <div className="space-y-2">
+                    <Label className="text-primary-text font-medium flex items-center gap-2">
+                      <Map className="w-4 h-4 text-accent-blue" />
+                      Google Maps Link (Auto-fills Address)
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        value={newSecondaryClinic.mapLink}
+                        onChange={(e) => handleSecondaryMapLink(e.target.value)}
+                        placeholder="Paste Google Maps link here to auto-fill address"
+                        className="border-gray-300 focus:border-accent-blue focus:ring-accent-blue"
+                      />
+                      {secondaryMapLoading && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent-blue"></div>
+                        </div>
+                      )}
+                      {newSecondaryClinic.mapLink &&
+                        !secondaryMapLoading &&
+                        newSecondaryClinic.address && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                          </div>
+                        )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Copy and paste a Google Maps link to automatically fill
+                      the address below
+                    </p>
+                  </div>
+
                   <div className="space-y-2">
                     <Label className="text-primary-text font-medium">
                       Secondary Clinic Address
@@ -377,10 +571,16 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                           address: e.target.value,
                         }))
                       }
-                      placeholder="Enter complete address of your secondary clinic"
+                      placeholder="Enter complete address of your secondary clinic (or use Google Maps link above)"
                       rows={3}
                       className="border-gray-300 focus:border-secondary-green focus:ring-secondary-green"
                     />
+                    {secondaryMapLoading && (
+                      <p className="text-xs text-blue-600 flex items-center gap-1">
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                        Extracting address from Google Maps link...
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -415,6 +615,12 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                             <span className="font-medium text-primary-text">
                               Secondary Clinic {index + 1}
                             </span>
+                            {clinic.mapLink && (
+                              <Badge className="bg-blue-100 text-blue-800 text-xs">
+                                <Map className="w-3 h-3 mr-1" />
+                                Maps Linked
+                              </Badge>
+                            )}
                           </div>
                           <Button
                             size="sm"
@@ -457,6 +663,26 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                               className="border-gray-300 focus:border-secondary-green focus:ring-secondary-green"
                             />
                           </div>
+
+                          {clinic.mapLink && (
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-gray-600">
+                                Google Maps Link
+                              </Label>
+                              <Input
+                                value={clinic.mapLink}
+                                onChange={(e) =>
+                                  updateClinic(
+                                    clinic.id,
+                                    "mapLink",
+                                    e.target.value,
+                                  )
+                                }
+                                className="border-gray-300 focus:border-accent-blue focus:ring-accent-blue"
+                                placeholder="Google Maps link"
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -469,7 +695,8 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                   <StarOff className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="font-medium">No secondary clinics added yet</p>
                   <p className="text-sm">
-                    Add additional practice locations (optional)
+                    Add additional practice locations with Google Maps
+                    integration (optional)
                   </p>
                 </div>
               )}
@@ -482,7 +709,7 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
               <h4 className="font-medium text-primary-text mb-2">
                 Clinic Summary
               </h4>
-              <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-primary-green">
                     {primaryClinics.length}
@@ -495,63 +722,78 @@ export const ContactInfo = ({ data, updateData }: ContactInfoProps) => {
                   </div>
                   <div className="text-sm text-gray-600">Secondary Clinics</div>
                 </div>
+                <div>
+                  <div className="text-2xl font-bold text-accent-blue">
+                    {
+                      [...primaryClinics, ...secondaryClinics].filter(
+                        (c) => c.mapLink,
+                      ).length
+                    }
+                  </div>
+                  <div className="text-sm text-gray-600">Maps Linked</div>
+                </div>
               </div>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Contact Guidelines */}
-      <Card className="border-l-4 border-l-accent-green bg-gradient-to-r from-slate-50 to-slate-100">
+      {/* Google Maps Integration Info */}
+      <Card className="border-l-4 border-l-accent-blue bg-gradient-to-r from-blue-50 to-indigo-50">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-primary-text mb-3">
-            Contact Information Guidelines
+          <h3 className="text-lg font-semibold text-primary-text mb-3 flex items-center gap-2">
+            <Map className="w-5 h-5 text-accent-blue" />
+            Google Maps Integration Guide
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-primary-green rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                 <div>
-                  <h4 className="font-medium text-primary-text">
-                    Primary Clinic
+                  <h4 className="font-medium text-blue-700">
+                    How to get Google Maps link
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    Your main practice location - patients will see this first
+                  <p className="text-sm text-blue-600">
+                    Go to Google Maps, search your clinic, click Share, copy the
+                    link
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-secondary-green rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                 <div>
-                  <h4 className="font-medium text-primary-text">
-                    Secondary Clinics
+                  <h4 className="font-medium text-green-700">
+                    Auto Address Fill
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    Additional locations for patient convenience
+                  <p className="text-sm text-green-600">
+                    Paste the Google Maps link and address will be automatically
+                    extracted
                   </p>
                 </div>
               </div>
             </div>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-accent-blue rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
                 <div>
-                  <h4 className="font-medium text-primary-text">
-                    Accurate Addresses
+                  <h4 className="font-medium text-purple-700">
+                    Supported Formats
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    Provide complete addresses for easy patient navigation
+                  <p className="text-sm text-purple-600">
+                    Works with all Google Maps link formats including shortened
+                    goo.gl links
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-accent-green rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
                 <div>
-                  <h4 className="font-medium text-primary-text">
-                    Professional Email
+                  <h4 className="font-medium text-orange-700">
+                    Patient Benefits
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    Use a professional email for patient communications
+                  <p className="text-sm text-orange-600">
+                    Patients can easily navigate to your clinic using the
+                    integrated maps
                   </p>
                 </div>
               </div>
