@@ -3,12 +3,996 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello world project</title>
+    <title>Doctor Registration - Medical Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
-
   <body>
-    <div id="root"></div>
+    <div class="app-container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Doctor Registration</h1>
+        <p>Join our medical platform and start serving patients</p>
+      </div>
 
-    <script type="module" src="/src/main.tsx"></script>
+      <!-- Main Registration Form -->
+      <div class="registration-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <h3>Registration Steps</h3>
+          </div>
+          <div class="steps-list">
+            <div class="step-item active" data-step="1">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 1</div>
+                <div class="step-title">Personal Information</div>
+              </div>
+            </div>
+            <div class="step-item" data-step="2">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 2</div>
+                <div class="step-title">Contact Information</div>
+              </div>
+            </div>
+            <div class="step-item" data-step="3">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 3</div>
+                <div class="step-title">Education & Qualification</div>
+              </div>
+            </div>
+            <div class="step-item" data-step="4">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 4</div>
+                <div class="step-title">Specialization</div>
+              </div>
+            </div>
+            <div class="step-item" data-step="5">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 5</div>
+                <div class="step-title">Availability</div>
+              </div>
+            </div>
+            <div class="step-item" data-step="6">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 6</div>
+                <div class="step-title">Charges & Payment</div>
+              </div>
+            </div>
+            <div class="step-item" data-step="7">
+              <div class="step-icon">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="step-content">
+                <div class="step-number">Step 7</div>
+                <div class="step-title">Review & Submit</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Form Content -->
+        <div class="form-content">
+          <div class="form-header">
+            <h2 id="currentStepTitle">Personal Information</h2>
+            <div class="progress-container">
+              <span id="stepIndicator">Step 1 of 7</span>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: Personal Information -->
+          <div class="step-content" id="step1">
+            <div class="card">
+              <h3><i class="fas fa-user"></i> Basic Information</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="firstName">First Name *</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    placeholder="Enter your first name"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Last Name *</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    placeholder="Enter your last name"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="dateOfBirth">Date of Birth *</label>
+                  <input type="date" id="dateOfBirth" />
+                </div>
+                <div class="form-group">
+                  <label for="mobileNumber">Mobile Number *</label>
+                  <div class="mobile-input-group">
+                    <input
+                      type="tel"
+                      id="mobileNumber"
+                      placeholder="+91 9876543210"
+                    />
+                    <button
+                      type="button"
+                      class="verify-btn"
+                      id="verifyMobileBtn"
+                    >
+                      Verify
+                    </button>
+                    <div
+                      class="verified-badge"
+                      id="verifiedBadge"
+                      style="display: none"
+                    >
+                      <i class="fas fa-check-circle"></i> Verified
+                    </div>
+                  </div>
+                  <div class="otp-input" id="otpInput" style="display: none">
+                    <input
+                      type="text"
+                      id="otpCode"
+                      placeholder="Enter OTP (use 123456 for demo)"
+                    />
+                    <button type="button" class="otp-btn" id="submitOtpBtn">
+                      Submit OTP
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3><i class="fas fa-language"></i> Languages Spoken</h3>
+              <div class="tabs">
+                <div class="tab-buttons">
+                  <button class="tab-btn active" data-tab="common-languages">
+                    Common Languages
+                  </button>
+                  <button class="tab-btn" data-tab="custom-language">
+                    Add Custom
+                  </button>
+                </div>
+                <div class="tab-content active" id="common-languages">
+                  <div class="language-grid" id="languageGrid"></div>
+                </div>
+                <div class="tab-content" id="custom-language">
+                  <div class="custom-language-input">
+                    <input
+                      type="text"
+                      id="customLanguageInput"
+                      placeholder="Enter language name"
+                    />
+                    <button type="button" id="addLanguageBtn">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="selected-languages" id="selectedLanguages"></div>
+            </div>
+
+            <div class="card">
+              <h3><i class="fas fa-upload"></i> Documents & Profile</h3>
+              <div class="upload-grid">
+                <div class="upload-item">
+                  <label>Resume/CV * (Auto-fills Bio)</label>
+                  <div class="upload-area" id="resumeUpload">
+                    <i class="fas fa-upload"></i>
+                    <p>Upload resume to auto-fill bio</p>
+                    <input
+                      type="file"
+                      id="resumeFile"
+                      accept=".pdf,.doc,.docx"
+                    />
+                  </div>
+                  <div class="upload-status" id="resumeStatus"></div>
+                </div>
+                <div class="upload-item">
+                  <label>Profile Picture</label>
+                  <div class="upload-area" id="profileUpload">
+                    <i class="fas fa-upload"></i>
+                    <p>Upload profile picture</p>
+                    <input type="file" id="profileFile" accept="image/*" />
+                  </div>
+                  <div class="upload-status" id="profileStatus"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3><i class="fas fa-user-md"></i> Professional Summary</h3>
+              <div class="form-group">
+                <label for="bio">Bio/Description *</label>
+                <textarea
+                  id="bio"
+                  placeholder="Tell patients about yourself, your experience, and your approach to medicine..."
+                  rows="5"
+                ></textarea>
+                <div
+                  class="auto-fill-notice"
+                  id="bioAutoFill"
+                  style="display: none"
+                >
+                  <i class="fas fa-magic"></i> Bio auto-filled from resume
+                </div>
+              </div>
+              <div class="awards-section">
+                <label>Awards & Recognition</label>
+                <div class="add-award">
+                  <input
+                    type="text"
+                    id="awardInput"
+                    placeholder="Enter award or recognition"
+                  />
+                  <button type="button" id="addAwardBtn">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <div class="awards-list" id="awardsList"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Contact Information -->
+          <div class="step-content" id="step2" style="display: none">
+            <div class="card">
+              <h3><i class="fas fa-phone"></i> Personal Contact Information</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="phoneNumber">Phone Number * (Auto-filled)</label>
+                  <input
+                    type="tel"
+                    id="phoneNumber"
+                    readonly
+                    class="auto-filled"
+                  />
+                  <small class="auto-fill-notice"
+                    >Auto-filled from mobile number verification</small
+                  >
+                </div>
+                <div class="form-group">
+                  <label for="email">Email Address *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="doctor@example.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>
+                <i class="fas fa-hospital"></i> Clinic Information (Primary &
+                Secondary)
+              </h3>
+              <div class="tabs">
+                <div class="tab-buttons">
+                  <button class="tab-btn active" data-tab="primary-clinic">
+                    <i class="fas fa-crown"></i> Primary Clinic (1 Only)
+                  </button>
+                  <button class="tab-btn" data-tab="secondary-clinic">
+                    <i class="fas fa-plus"></i> Secondary Clinics (Multiple)
+                  </button>
+                </div>
+
+                <div class="tab-content active" id="primary-clinic">
+                  <div class="clinic-notice primary">
+                    <i class="fas fa-crown"></i>
+                    <div>
+                      <strong>Primary Clinic (Only ONE Allowed)</strong>
+                      <p>
+                        Your main practice location where you spend most of your
+                        time.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="add-clinic-form" id="primaryClinicForm">
+                    <div class="form-group">
+                      <label for="primaryClinicName"
+                        >Primary Clinic Name *</label
+                      >
+                      <input
+                        type="text"
+                        id="primaryClinicName"
+                        placeholder="Enter your main clinic name"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="primaryMapLink"
+                        >Google Maps Link (Auto-fills Address)</label
+                      >
+                      <div class="map-input-group">
+                        <input
+                          type="url"
+                          id="primaryMapLink"
+                          placeholder="Paste Google Maps link here"
+                        />
+                        <div class="map-status" id="primaryMapStatus"></div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="primaryClinicAddress"
+                        >Primary Clinic Address *</label
+                      >
+                      <textarea
+                        id="primaryClinicAddress"
+                        placeholder="Enter complete address"
+                        rows="3"
+                      ></textarea>
+                      <div
+                        class="map-extracting"
+                        id="primaryMapExtracting"
+                        style="display: none"
+                      >
+                        <i class="fas fa-spinner fa-spin"></i> Extracting
+                        address from Google Maps link...
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="add-clinic-btn"
+                      id="addPrimaryClinicBtn"
+                    >
+                      <i class="fas fa-crown"></i> Add Primary Clinic
+                    </button>
+                  </div>
+                  <div class="clinics-list" id="primaryClinicsList"></div>
+                  <div
+                    class="clinic-limit-notice"
+                    id="primaryLimitNotice"
+                    style="display: none"
+                  >
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                      <strong>Primary Clinic Limit Reached</strong>
+                      <p>
+                        You can only have ONE primary clinic. To add a different
+                        one, remove the existing primary clinic first.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-content" id="secondary-clinic">
+                  <div class="clinic-notice secondary">
+                    <i class="fas fa-plus"></i>
+                    <div>
+                      <strong>Secondary Clinics (Multiple Allowed)</strong>
+                      <p>
+                        Additional practice locations where you provide
+                        consultations.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="add-clinic-form">
+                    <div class="form-group">
+                      <label for="secondaryClinicName"
+                        >Secondary Clinic Name</label
+                      >
+                      <input
+                        type="text"
+                        id="secondaryClinicName"
+                        placeholder="Enter secondary clinic name"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="secondaryMapLink"
+                        >Google Maps Link (Auto-fills Address)</label
+                      >
+                      <div class="map-input-group">
+                        <input
+                          type="url"
+                          id="secondaryMapLink"
+                          placeholder="Paste Google Maps link here"
+                        />
+                        <div class="map-status" id="secondaryMapStatus"></div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="secondaryClinicAddress"
+                        >Secondary Clinic Address</label
+                      >
+                      <textarea
+                        id="secondaryClinicAddress"
+                        placeholder="Enter complete address"
+                        rows="3"
+                      ></textarea>
+                      <div
+                        class="map-extracting"
+                        id="secondaryMapExtracting"
+                        style="display: none"
+                      >
+                        <i class="fas fa-spinner fa-spin"></i> Extracting
+                        address from Google Maps link...
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="add-clinic-btn secondary"
+                      id="addSecondaryClinicBtn"
+                    >
+                      <i class="fas fa-plus"></i> Add Secondary Clinic
+                    </button>
+                  </div>
+                  <div class="clinics-list" id="secondaryClinicsList"></div>
+                </div>
+              </div>
+              <div
+                class="clinic-summary"
+                id="clinicSummary"
+                style="display: none"
+              >
+                <h4>Clinic Summary</h4>
+                <div class="summary-grid">
+                  <div class="summary-item">
+                    <div class="count primary" id="primaryCount">0</div>
+                    <div class="label">Primary (Max: 1)</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="count secondary" id="secondaryCount">0</div>
+                    <div class="label">Secondary (Unlimited)</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="count maps" id="mapsCount">0</div>
+                    <div class="label">Maps Linked</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Education -->
+          <div class="step-content" id="step3" style="display: none">
+            <div class="card">
+              <h3>
+                <i class="fas fa-graduation-cap"></i> Educational Background
+                (With Smart Suggestions)
+              </h3>
+              <div class="form-grid">
+                <div class="form-group suggestion-field">
+                  <label for="degree">Highest Medical Degree *</label>
+                  <div class="suggestion-input">
+                    <input
+                      type="text"
+                      id="degree"
+                      placeholder="Type to search degrees (e.g., MBBS, MD, MS...)"
+                    />
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <div
+                    class="suggestions-dropdown"
+                    id="degreeSuggestions"
+                  ></div>
+                  <small>Start typing to see degree suggestions</small>
+                </div>
+                <div class="form-group suggestion-field">
+                  <label for="university">University/Institute *</label>
+                  <div class="suggestion-input">
+                    <input
+                      type="text"
+                      id="university"
+                      placeholder="Type to search institutes (e.g., AIIMS, CMC...)"
+                    />
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <div
+                    class="suggestions-dropdown"
+                    id="universitySuggestions"
+                  ></div>
+                  <small>Search from 100+ Indian medical colleges</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>
+                <i class="fas fa-certificate"></i> Medical License Information
+              </h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="licenseNumber">Medical License Number *</label>
+                  <input
+                    type="text"
+                    id="licenseNumber"
+                    placeholder="Enter your license number"
+                  />
+                </div>
+                <div class="form-group suggestion-field">
+                  <label for="authority">Issuing Authority *</label>
+                  <div class="suggestion-input">
+                    <input
+                      type="text"
+                      id="authority"
+                      placeholder="Type to search authorities (e.g., NMC, State Medical Council...)"
+                    />
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <div
+                    class="suggestions-dropdown"
+                    id="authoritySuggestions"
+                  ></div>
+                  <small>Search from national and state medical councils</small>
+                </div>
+                <div class="form-group">
+                  <label for="licenseExpiry">License Expiry Date *</label>
+                  <input type="date" id="licenseExpiry" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Upload Medical License Document</label>
+                <div class="upload-area large" id="licenseUpload">
+                  <i class="fas fa-upload"></i>
+                  <h4>Upload Medical License</h4>
+                  <p>Accepted formats: PDF, JPG, PNG (Max size: 10MB)</p>
+                  <input
+                    type="file"
+                    id="licenseFile"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  />
+                </div>
+                <div class="upload-status" id="licenseStatus"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Specialization -->
+          <div class="step-content" id="step4" style="display: none">
+            <div class="tabs">
+              <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="specialty-selection">
+                  <i class="fas fa-stethoscope"></i> Select ONE Specialty
+                </button>
+                <button
+                  class="tab-btn"
+                  data-tab="services-selection"
+                  id="servicesTab"
+                  disabled
+                >
+                  <i class="fas fa-cogs"></i> Services Offered
+                </button>
+              </div>
+
+              <div class="tab-content active" id="specialty-selection">
+                <div class="card">
+                  <h3>
+                    <i class="fas fa-stethoscope"></i> Select Your PRIMARY
+                    Medical Specialty (Only ONE)
+                  </h3>
+                  <div class="specialty-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Important:</strong> You can select only ONE primary
+                    specialty. Choose carefully.
+                  </div>
+                  <div class="specialty-grid" id="specialtyGrid"></div>
+                  <div
+                    class="selected-specialty"
+                    id="selectedSpecialty"
+                    style="display: none"
+                  >
+                    <div class="specialty-display">
+                      <i class="fas fa-stethoscope"></i>
+                      <div>
+                        <strong>Selected Specialty:</strong>
+                        <div class="specialty-badge" id="specialtyBadge"></div>
+                        <p>
+                          Perfect! Now you can proceed to select the services
+                          you offer.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-content" id="services-selection">
+                <div class="card">
+                  <h3>
+                    <i class="fas fa-cogs"></i> Services Offered in
+                    <span id="specialtyName">Your Specialty</span>
+                  </h3>
+                  <div class="services-section">
+                    <h4>Common Services</h4>
+                    <div class="services-grid" id="servicesGrid"></div>
+                  </div>
+                  <div class="custom-service-section">
+                    <h4>Add Custom Service</h4>
+                    <div class="custom-service-input">
+                      <input
+                        type="text"
+                        id="customServiceInput"
+                        placeholder="Enter custom service name"
+                      />
+                      <button type="button" id="addServiceBtn">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="selected-services" id="selectedServices"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card summary-card">
+              <h3>Specialization Summary</h3>
+              <div class="summary-grid">
+                <div class="summary-item">
+                  <div class="count" id="specialtyCount">0</div>
+                  <div class="label">Primary Specialty</div>
+                  <div class="sub-label" id="specialtyDisplay"></div>
+                </div>
+                <div class="summary-item">
+                  <div class="count" id="servicesCount">0</div>
+                  <div class="label">Services Offered</div>
+                  <div class="sub-label" id="servicesDisplay"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5: Availability -->
+          <div class="step-content" id="step5" style="display: none">
+            <div class="card">
+              <h3>
+                <i class="fas fa-hospital"></i> Select Clinic for Availability
+                Setup
+              </h3>
+              <div class="clinic-selection" id="clinicSelection">
+                <select id="availabilityClinic">
+                  <option value="">Choose a clinic to set availability</option>
+                </select>
+                <div
+                  class="selected-clinic-info"
+                  id="selectedClinicInfo"
+                  style="display: none"
+                ></div>
+              </div>
+              <div class="no-clinics-notice" id="noClinicsNotice">
+                <i class="fas fa-info-circle"></i>
+                <p>Please add clinics in the Contact Information step first</p>
+              </div>
+            </div>
+
+            <div
+              class="availability-content"
+              id="availabilityContent"
+              style="display: none"
+            >
+              <div class="card">
+                <h3>
+                  <i class="fas fa-calendar"></i> Weekly Availability Summary
+                </h3>
+                <div class="availability-summary">
+                  <div class="summary-item">
+                    <div class="count" id="workingDaysCount">0</div>
+                    <div class="label">Working Days</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="count" id="breakSlotsCount">0</div>
+                    <div class="label">Break Slots</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="count" id="onlineSlotsCount">0</div>
+                    <div class="label">Online Slots</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="count" id="hoursSetStatus">✗</div>
+                    <div class="label">Hours Set</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3>Select Day to Configure</h3>
+                <div class="days-grid" id="daysGrid"></div>
+              </div>
+
+              <div class="card">
+                <div class="day-config-header">
+                  <h3>
+                    <i class="fas fa-clock"></i>
+                    <span id="currentDayName">Monday</span> Schedule
+                  </h3>
+                  <div class="day-controls">
+                    <label class="switch-label">
+                      <span>Working Day</span>
+                      <div class="switch">
+                        <input type="checkbox" id="workingDayToggle" />
+                        <span class="slider"></span>
+                      </div>
+                    </label>
+                    <button
+                      type="button"
+                      class="copy-schedule-btn"
+                      id="copyScheduleBtn"
+                      style="display: none"
+                    >
+                      Copy to All Days
+                    </button>
+                  </div>
+                </div>
+                <div
+                  class="day-schedule-content"
+                  id="dayScheduleContent"
+                  style="display: none"
+                >
+                  <div class="schedule-section">
+                    <h4>Clinic Hours</h4>
+                    <div class="time-inputs">
+                      <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" id="workStartTime" />
+                      </div>
+                      <div class="form-group">
+                        <label>End Time</label>
+                        <input type="time" id="workEndTime" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="schedule-section">
+                    <div class="section-header">
+                      <h4>Break Times</h4>
+                      <button
+                        type="button"
+                        class="add-time-btn"
+                        id="addBreakBtn"
+                      >
+                        <i class="fas fa-plus"></i> Add Break
+                      </button>
+                    </div>
+                    <div class="time-slots" id="breakSlots"></div>
+                  </div>
+
+                  <div class="schedule-section">
+                    <div class="section-header">
+                      <h4>
+                        <i class="fas fa-video"></i> Online Consultation Times
+                      </h4>
+                      <button
+                        type="button"
+                        class="add-time-btn online"
+                        id="addOnlineBtn"
+                      >
+                        <i class="fas fa-plus"></i> Add Online Slot
+                      </button>
+                    </div>
+                    <div class="time-slots" id="onlineSlots"></div>
+                  </div>
+                </div>
+                <div class="day-off-notice" id="dayOffNotice">
+                  <i class="fas fa-calendar-times"></i>
+                  <h4>Day Off</h4>
+                  <p>This day is marked as non-working</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 6: Charges -->
+          <div class="step-content" id="step6" style="display: none">
+            <div class="card">
+              <h3>
+                <i class="fas fa-rupee-sign"></i> Consultation Charges (Indian
+                Rupees ₹ Only)
+              </h3>
+              <p class="charges-notice">
+                All charges are in Indian Rupees (₹). Set competitive rates
+                based on your experience and location.
+              </p>
+            </div>
+
+            <div class="charges-grid">
+              <div class="card charge-card">
+                <h3>
+                  <i class="fas fa-clinic-medical"></i> Clinic Visit Charges
+                </h3>
+                <div class="form-group">
+                  <label>Consultation Fee (₹)</label>
+                  <div class="rupee-input">
+                    <span>₹</span>
+                    <input type="number" id="clinicCharges" placeholder="500" />
+                  </div>
+                  <div class="price-display" id="clinicPrice"></div>
+                </div>
+                <div class="service-info">
+                  <strong>In-Person Consultation</strong>
+                  <p>Physical examination and consultation at your clinic</p>
+                </div>
+              </div>
+
+              <div class="card charge-card">
+                <h3>
+                  <i class="fas fa-video"></i> Online Consultation Charges
+                </h3>
+                <div class="form-group">
+                  <label>Video Call Fee (₹)</label>
+                  <div class="rupee-input">
+                    <span>₹</span>
+                    <input type="number" id="onlineCharges" placeholder="300" />
+                  </div>
+                  <div class="price-display" id="onlinePrice"></div>
+                </div>
+                <div class="service-info">
+                  <strong>Virtual Consultation</strong>
+                  <p>Remote consultation via video call or chat</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>
+                <i class="fas fa-credit-card"></i> Accepted Payment Methods
+                (Indian Only)
+              </h3>
+              <p>
+                Select the Indian digital payment methods you accept for
+                consultations
+              </p>
+              <div class="payment-methods" id="paymentMethods"></div>
+              <div class="selected-payments" id="selectedPayments"></div>
+            </div>
+
+            <div class="card summary-card">
+              <h3>Pricing Summary (₹ Rupees)</h3>
+              <div class="pricing-summary">
+                <div class="price-item">
+                  <i class="fas fa-clinic-medical"></i>
+                  <div class="price-details">
+                    <div class="service">Clinic Visit</div>
+                    <div class="amount" id="clinicSummaryPrice">Not Set</div>
+                  </div>
+                </div>
+                <div class="price-item">
+                  <i class="fas fa-video"></i>
+                  <div class="price-details">
+                    <div class="service">Online Consultation</div>
+                    <div class="amount" id="onlineSummaryPrice">Not Set</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 7: Review -->
+          <div class="step-content" id="step7" style="display: none">
+            <div class="card completion-status" id="completionStatus">
+              <h3 id="completionTitle">Registration Completion Status</h3>
+              <div class="completion-grid" id="completionGrid"></div>
+              <p class="completion-notice" id="completionNotice"></p>
+            </div>
+
+            <div class="card doctor-profile">
+              <h3><i class="fas fa-user-md"></i> Doctor Profile Summary</h3>
+              <div class="profile-header">
+                <div class="profile-photo">
+                  <div class="avatar" id="doctorAvatar">
+                    <img id="doctorPhoto" style="display: none" />
+                    <div class="avatar-fallback" id="avatarFallback">DR</div>
+                  </div>
+                  <div class="photo-status" id="photoStatus">
+                    <i class="fas fa-camera"></i> No Photo
+                  </div>
+                </div>
+                <div class="profile-info">
+                  <h2 id="doctorName">Dr. First Last</h2>
+                  <div class="profile-details">
+                    <div class="detail-item">
+                      <i class="fas fa-stethoscope"></i>
+                      <span id="profileSpecialty">Specialty not selected</span>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-phone"></i>
+                      <span id="profilePhone">Phone not provided</span>
+                      <div
+                        class="verified-badge small"
+                        id="profileVerified"
+                        style="display: none"
+                      >
+                        <i class="fas fa-shield-alt"></i> Verified
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-envelope"></i>
+                      <span id="profileEmail">Email not provided</span>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-hospital"></i>
+                      <span id="profileClinics"
+                        >0 Primary + 0 Secondary Clinics</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="bio-preview"
+                    id="bioPreview"
+                    style="display: none"
+                  >
+                    <h4>Professional Bio</h4>
+                    <p id="bioText"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="review-sections" id="reviewSections"></div>
+
+            <div class="card final-submission">
+              <h3>Ready to Submit Your Registration?</h3>
+              <p>
+                Please review all information above including your profile
+                photo. Once submitted, your registration will be reviewed by our
+                team.
+              </p>
+              <button
+                type="button"
+                class="submit-btn"
+                id="finalSubmitBtn"
+                disabled
+              >
+                Complete All Sections First
+              </button>
+              <p class="submission-notice" id="submissionNotice">
+                Please complete all required sections before submitting.
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="form-navigation">
+            <button type="button" class="nav-btn prev" id="prevBtn" disabled>
+              Previous
+            </button>
+            <button type="button" class="nav-btn next" id="nextBtn">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success Modal -->
+      <div class="modal" id="successModal" style="display: none">
+        <div class="modal-content">
+          <div class="success-animation">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h2>Registration Successful! 🎉</h2>
+          <p>
+            Congratulations! Your doctor registration has been submitted
+            successfully.
+          </p>
+          <button type="button" class="modal-btn" onclick="closeSuccessModal()">
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
   </body>
 </html>
